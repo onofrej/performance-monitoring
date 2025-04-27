@@ -49,6 +49,6 @@ jobs:
       - name: Test
         run: |
           mkdir scripts
-          mv ./performance-monitoring/UserApi/tests/IntegrationTests/Fixtures/PostgreSql/PostgreSqlScript.sql ./scripts
+          mv ./UserApi/tests/IntegrationTests/Fixtures/PostgreSql/PostgreSqlScript.sql ./scripts
           docker compose -f ./tests/IntegrationTests/docker-compose.yaml up -d
           dotnet test ./tests/IntegrationTests/*.csproj
