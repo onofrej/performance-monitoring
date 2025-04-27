@@ -1,0 +1,32 @@
+{
+  "Authentication": {
+    "JwtBearerToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNjk0NTJjNC1lNjhjLTQ1Y2MtYjA3NC0yMzJkZGI3MmVlMzMiLCJzdWIiOiIyY2Y2Nzg4OS00YTY4LTQxY2EtOWMwNy03OWYxY2MzMTg4ZjAiLCJlbWFpbCI6ImhlaWRpOTZAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiUm9vdCIsIm5iZiI6MTcyNjA4MTcxNywiZXhwIjoyNzI2MDg4OTE3LCJpc3MiOiJTUFcuU2VjdXJpdHkuQXBpIiwiYXVkIjoiU1BXIn0.ZgXkhOoZSEeU2japndlqeMEUIwXMxSFb-hLlt-PxIvw"
+  },
+  "AWSLocalstackSettings": {
+    "ServiceURL": "http://localhost:4566",
+    "SqsSettings": {
+      "Queues": [
+        {
+          "Arn": "sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/user-created",
+          "Name": "user-created",
+          "Url": "http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/user-created"
+        }
+      ]
+    },
+    "SecretsManagerSettings": {
+      "Secrets": [
+        {
+          "Name": "prod/user/dbconnectionstring",
+          "Value": "Host=localhost;Port=5432;Database=db-user;Username=admin;Password=integrated-test-pwd"
+        },
+        {
+          "Name": "prod/user/secretkey3",
+          "Value": "qwertyuiopasdfghjklzxcvbnm123456"
+        }
+      ]
+    }
+  },
+  "PostgreSQL": {
+    "ConnectionString": "Host=localhost;Port=5432;Database=db-user;Username=admin;Password=integrated-test-pwd"
+  }
+}
