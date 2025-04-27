@@ -3,7 +3,7 @@ name: ASP.NET 8 Build
 on:
   push:
     branches:
-      - "feature**"
+      - "develop"
 
 jobs:
   Build:
@@ -70,8 +70,7 @@ jobs:
    
       - name: Test
         run: |
-          git clone https://github.com/specialpublicwitnessing/SPW.Infrastructure.git
           mkdir scripts
-          mv ./SPW.Infrastructure/infra/terraform/rds/scripts/database-script.sql ./scripts
+          mv ./performance-monitoring/UserApi/tests/IntegrationTests/Fixtures/PostgreSql/PostgreSqlScript.sql ./scripts
           docker compose -f ./tests/IntegrationTests/docker-compose.yaml up -d
           dotnet test ./tests/IntegrationTests/*.csproj

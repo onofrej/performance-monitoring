@@ -10,3 +10,5 @@
             POSTGRES_USER: admin
             POSTGRES_PASSWORD: admin@1234
             POSTGRES_DB: db-user
+        volumes:
+            - ./PostgreSqlScript.sql:/docker-entrypoint-initdb.d/PostgreSqlScript.sql
