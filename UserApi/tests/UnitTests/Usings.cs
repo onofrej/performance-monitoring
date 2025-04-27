@@ -1,0 +1,13 @@
+global using System.Net;
+global using Amazon.SQS;
+global using Amazon.SQS.Model;
+global using AutoFixture;
+global using FluentAssertions;
+global using FluentValidation;
+global using FluentValidation.Results;
+global using Microsoft.Extensions.Options;
+global using Moq;
+global using SPW.Common.Security.Options;
+global using SPW.Common.Wires.Data;
+global using SPW.Common.Wires.Data.Entities;
+global using Xunit;
