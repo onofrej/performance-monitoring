@@ -5,18 +5,19 @@ using User.Api.Features.User.GetById;
 namespace User.Api.Features.User;
 
 [ExcludeFromCodeCoverage]
-public sealed class EndPoints(ILogger<EndPoints> logger) : ICarterModule
+public sealed class EndPoints : ICarterModule
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public void AddRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
-        var group = app.MapGroup("/users")
+        var group = endpointRouteBuilder.MapGroup("/users")
             .WithTags("Users");
 
         group.MapGet(string.Empty, GetUsersAsync);
         group.MapGet("/{id:guid}", GetByIdAsync);
     }
 
-    public async Task<IResult> GetUsersAsync(ISender _sender,
+    public static async Task<IResult> GetUsersAsync(ISender _sender,
+        ILogger<EndPoints> logger,
         CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetAllQuery(), cancellationToken);
@@ -26,12 +27,13 @@ public sealed class EndPoints(ILogger<EndPoints> logger) : ICarterModule
             return Results.BadRequest(new Response<Guid>(Guid.Empty, result.Error));
         }
 
-        logger.LogInformation("Users retreived with success - count: {Count}", result.Data!.Count());
+        logger.LogInformation("Users retrieved with success - count: {Count}", result.Data!.Count());
 
         return Results.Ok(new Response<IEnumerable<Response>>(result.Data!.MapToResponse()));
     }
 
-    public async Task<IResult> GetByIdAsync([FromRoute] Guid id, ISender _sender,
+    public static async Task<IResult> GetByIdAsync([FromRoute] Guid id, ISender _sender,
+        ILogger<EndPoints> logger,
         CancellationToken cancellationToken)
     {
         var query = new GetByIdQuery(id);
