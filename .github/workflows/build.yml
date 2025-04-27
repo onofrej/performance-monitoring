@@ -87,9 +87,7 @@ jobs:
           mkdir scripts
           mv ./UserApi/tests/IntegrationTests/Fixtures/PostgreSql/PostgreSqlScript.sql ./scripts
           docker compose -f ./UserApi/tests/IntegrationTests/docker-compose.yaml up -d
-          dotnet run --project ./UserApi/src/Api/Api.csproj & 
-          DOTNET_PID=$!
+          dotnet run --project ./UserApi/src/Api/Api.csproj > /dev/null &
           sleep 5
           k6 run ./UserApi/tests/PerformanceTests/GetAllUsersTest.js --out json=./UserApi/tests/PerformanceTests/results.json
           k6 stats ./UserApi/tests/PerformanceTests/results.json
-          kill $DOTNET_PID
