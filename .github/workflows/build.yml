@@ -54,7 +54,7 @@ jobs:
   #         dotnet test ./UserApi/tests/IntegrationTests/*.csproj
 
   Performance-tests:
-    name: Run integration tests
+    name: Run performance tests
     runs-on: ubuntu-latest
     timeout-minutes: 2
     needs: Build
@@ -74,20 +74,18 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release
    
+      - name: Install K6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y k6
+          
       - name: Test
         run: |
           mkdir scripts
-          
           mv ./UserApi/tests/IntegrationTests/Fixtures/PostgreSql/PostgreSqlScript.sql ./scripts
-          
           docker compose -f ./UserApi/tests/IntegrationTests/docker-compose.yaml up -d
-          
           dotnet run --project ./UserApi/src/Api/Api.csproj &
-
           DOTNET_PID=$!
-
           sleep 5
-
           curl -k https://localhost:55539/users
-
           kill $DOTNET_PID
