@@ -25,7 +25,35 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release
 
-  Integration-tests:
+  # Integration-tests:
+  #   name: Run integration tests
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 2
+  #   needs: Build
+    
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup .NET Core SDK
+  #       uses: actions/setup-dotnet@v1
+  #       with:
+  #         dotnet-version: "8.x" # Change to the version of .NET Core you need
+
+  #     - name: Restore dependencies
+  #       run: dotnet restore
+
+  #     - name: Build
+  #       run: dotnet build --configuration Release
+   
+  #     - name: Test
+  #       run: |
+  #         mkdir scripts
+  #         mv ./UserApi/tests/IntegrationTests/Fixtures/PostgreSql/PostgreSqlScript.sql ./scripts
+  #         docker compose -f ./UserApi/tests/IntegrationTests/docker-compose.yaml up -d
+  #         dotnet test ./UserApi/tests/IntegrationTests/*.csproj
+
+  Performance-tests:
     name: Run integration tests
     runs-on: ubuntu-latest
     timeout-minutes: 2
@@ -49,6 +77,17 @@ jobs:
       - name: Test
         run: |
           mkdir scripts
+          
           mv ./UserApi/tests/IntegrationTests/Fixtures/PostgreSql/PostgreSqlScript.sql ./scripts
+          
           docker compose -f ./UserApi/tests/IntegrationTests/docker-compose.yaml up -d
-          dotnet test ./UserApi/tests/IntegrationTests/*.csproj
+          
+          dotnet run --project ./UserApi/src/Api/Api.csproj &
+
+          DOTNET_PID=$!
+
+          sleep 5
+
+          curl -k https://localhost:55539/users
+
+          kill $DOTNET_PID
