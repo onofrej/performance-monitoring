@@ -5,21 +5,12 @@ namespace User.Api.DependencyInjection;
 [ExcludeFromCodeCoverage]
 internal static class ServiceCollectionExtensions
 {
-    internal static IServiceCollection InitializeApplicationDependencies(this IServiceCollection services)
+    internal static IServiceCollection InitializeApplicationDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        services.InitializeAwsServices()
-            .InitializeDatabase()
+        services.InitializeDatabase(configuration)
             .InitializeLog()
             .InitializeMediatr()
             .InitializeSwagger();
-
-        return services;
-    }
-
-    private static IServiceCollection InitializeAwsServices(this IServiceCollection services)
-    {
-        //services.AddAWSService<IAmazonSecretsManager>();
-        //services.AddAWSService<IAmazonSQS>();
 
         return services;
     }
@@ -53,14 +44,15 @@ internal static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection InitializeDatabase(this IServiceCollection services)
+    private static IServiceCollection InitializeDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<IDataAccess, DataAccess>();
 
         services.AddSingleton(_ =>
         {
             DefaultTypeMap.MatchNamesWithUnderscores = true;
-            return new NpgsqlDataSourceBuilder("").Build();
+            return new NpgsqlDataSourceBuilder(configuration
+                .GetSection("PostgreSQL:ConnectionString").Value).Build();
         });
 
         return services;

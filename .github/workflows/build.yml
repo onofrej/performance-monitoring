@@ -1,0 +1,77 @@
+name: ASP.NET 8 Build
+
+on:
+  push:
+    branches:
+      - "feature**"
+
+jobs:
+  Build:
+    name: Build .NET application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "8.x" # Change to the version of .NET Core you need
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release
+
+  Unit-tests:
+    name: Run unit tests and get code coverage
+    runs-on: ubuntu-latest
+    needs: Build
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "8.x" # Change to the version of .NET Core you need
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Test
+        run: dotnet test ./tests/UnitTests/*.csproj --no-restore --logger:"trx" /p:CollectCoverage=\"true\" /p:CoverletOutputFormat=\"opencover\" /p:Exclude=\"[xunit.*]*\"
+
+  Integration-tests:
+    name: Run integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: Unit-tests
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "8.x" # Change to the version of .NET Core you need
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release
+   
+      - name: Test
+        run: |
+          git clone https://github.com/specialpublicwitnessing/SPW.Infrastructure.git
+          mkdir scripts
+          mv ./SPW.Infrastructure/infra/terraform/rds/scripts/database-script.sql ./scripts
+          docker compose -f ./tests/IntegrationTests/docker-compose.yaml up -d
+          dotnet test ./tests/IntegrationTests/*.csproj

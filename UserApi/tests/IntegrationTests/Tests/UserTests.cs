@@ -11,25 +11,27 @@ public class UserTests(MainFixture mainFixture) : BaseIntegratedTest
     internal const string InsertUserQuery = @"INSERT INTO ""user"" (id, name, email) VALUES (@Id, @Name, @Email)";
     private const string RequestUri = "/users";
 
-    private static Entity CreateEntity()
+    private static List<Entity> CreateEntity(int numberOfItemsToCreate)
     {
         return new Faker<Entity>().StrictMode(true)
             .RuleFor(property => property.Email, setter => setter.Internet.Email(setter.Person.FirstName.ToLower()))
             .RuleFor(property => property.Id, _ => Guid.NewGuid())
             .RuleFor(property => property.Name, setter => setter.Name.FullName(Bogus.DataSets.Name.Gender.Male))
-            .Generate();
+            .Generate(numberOfItemsToCreate);
     }
 
     [Fact(DisplayName = "User id received is valid and user is returned")]
     public async Task User_id_received_is_valid_and_user_is_returned()
     {
         //Arrange
-        var userEntity = CreateEntity();
+        var userEntity = CreateEntity(numberOfItemsToCreate: 1).FirstOrDefault();
+
+        await mainFixture.PostgreSqlFixture.TruncateTableAsync(@"""user""", GetCancellationToken);
 
         await mainFixture.PostgreSqlFixture.CreateAsync(userEntity, InsertUserQuery, GetCancellationToken);
 
         //Act
-        var rawResponse = await mainFixture.HttpClient.GetAsync($"{RequestUri}/{userEntity.Id}", GetCancellationToken);
+        var rawResponse = await mainFixture.HttpClient.GetAsync($"{RequestUri}/{userEntity!.Id}", GetCancellationToken);
 
         //Assert
         rawResponse.Should().NotBeNull();
@@ -46,18 +48,12 @@ public class UserTests(MainFixture mainFixture) : BaseIntegratedTest
     public async Task Request_received_is_valid_and_users_are_returned()
     {
         //Arrange
-        const int NumberOfItemsToCreate = 10;
+        var userEntities = CreateEntity(numberOfItemsToCreate: 10);
 
-        var userEntities = new Faker<Entity>().StrictMode(true)
-            .RuleFor(property => property.Email, setter => setter.Internet.Email(setter.Person.FirstName.ToLower()))
-            .RuleFor(property => property.Id, _ => Guid.NewGuid())
-            .RuleFor(property => property.Name, setter => setter.Name.FullName(Bogus.DataSets.Name.Gender.Male))
-            .Generate(NumberOfItemsToCreate);
+        await mainFixture.PostgreSqlFixture.TruncateTableAsync(@"""user""", GetCancellationToken);
 
-        foreach (var userEntity in userEntities)
-        {
-            await mainFixture.PostgreSqlFixture.CreateAsync(userEntity, InsertUserQuery, GetCancellationToken);
-        }
+        userEntities.ForEach(async userEntity =>
+            await mainFixture.PostgreSqlFixture.CreateAsync(userEntity, InsertUserQuery, GetCancellationToken));
 
         //Act
         var rawResponse = await mainFixture.HttpClient.GetAsync(RequestUri, GetCancellationToken);

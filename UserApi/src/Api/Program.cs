@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.InitializeApplicationDependencies();
+builder.Services.InitializeApplicationDependencies(builder.Configuration);
 
 var app = builder.Build();
 

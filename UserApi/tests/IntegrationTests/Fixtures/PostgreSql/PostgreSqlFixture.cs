@@ -22,10 +22,9 @@ internal sealed class PostgreSqlFixture(IConfiguration _configuration) : IDispos
     {
         await using var connection = new NpgsqlConnection(_connectionString);
         await connection.OpenAsync(cancellationToken);
-        await connection.ExecuteAsync($"TRUNCATE TABLE {tableName};");
+        await connection.ExecuteAsync(@$"TRUNCATE TABLE {tableName};");
     }
 
     public void Dispose()
-    {
-    }
+    { }
 }
