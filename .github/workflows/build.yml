@@ -51,4 +51,4 @@ jobs:
           mkdir scripts
           mv ./UserApi/tests/IntegrationTests/Fixtures/PostgreSql/PostgreSqlScript.sql ./scripts
           docker compose -f ./UserApi/tests/IntegrationTests/docker-compose.yaml up -d
-          dotnet test ./tests/IntegrationTests/*.csproj
+          dotnet test ./UserApi/tests/IntegrationTests/*.csproj
